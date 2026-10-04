@@ -54,7 +54,7 @@ private:
 
         Pair& operator=(const Pair& other)
         {
-            if (*this != &other)
+            if (this != &other)
             {
                 free_pair();
                 allocate(other._key, other._value);
@@ -65,7 +65,7 @@ private:
 
         Pair& operator=(Pair&& other) noexcept
         {
-            if (*this != &other)
+            if (this != &other)
             {
                 free_pair();
                 move_pair(std::move(other));
