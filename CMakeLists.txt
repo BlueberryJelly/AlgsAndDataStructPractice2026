@@ -12,3 +12,5 @@ if(CMAKE_CXX_COMPILE_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILE_ID STREQUAL "GNU")
 elseif(CMAKE_COMPILE_ID STREQUAL "MSVC")
     add_compile_options(/utf-8 /W4)
 endif()
+
+add_subdirectory(practice_2)
