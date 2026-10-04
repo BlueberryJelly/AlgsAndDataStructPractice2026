@@ -1,0 +1,82 @@
+export module pairs;
+
+import std;
+
+export template<std::size_t KeySize = 256, std::size_t Capacity = 16>
+class PairContainer final
+{
+private:
+    class Pair final
+    {
+    private:
+        void allocate(const char* key, double value)
+        {
+            _key = new char[KeySize];
+            _key = std::strcpy(_key, key);
+            _value = value;
+        }
+
+        void free_pair() noexcept
+        {
+            delete[] _key;
+            _key = nullptr;
+            _value = 0;
+        }
+
+        void move_pair(Pair&& other) noexcept
+        {
+            _key = other._key;
+            other._key = nullptr;
+            _value = other._value;
+            other._value = 0;
+        }
+
+    public:
+        char* _key = nullptr;
+        double _value = 0;
+
+        Pair() = default;
+
+        Pair(const char* key, double value)
+        {
+            allocate(key, value);
+        }
+
+        Pair(const Pair& other)
+        {
+            allocate(other._key, other._value);
+        }
+
+        Pair(Pair&& other) noexcept
+        {
+            move_pair(std::move(other));
+        }
+
+        Pair& operator=(const Pair& other)
+        {
+            if (*this != &other)
+            {
+                free_pair();
+                allocate(other._key, other._value);
+            }
+
+            return *this;
+        }
+
+        Pair& operator=(Pair&& other) noexcept
+        {
+            if (*this != &other)
+            {
+                free_pair();
+                move_pair(std::move(other));
+            }
+
+            return *this;
+        }
+
+        ~Pair()
+        {
+            free_pair();
+        }
+    };
+};
