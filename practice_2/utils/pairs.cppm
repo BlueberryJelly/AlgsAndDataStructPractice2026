@@ -2,7 +2,7 @@ export module pairs;
 
 import std;
 
-export template<std::size_t KeySize = 256, std::size_t Capacity = 16>
+export template<std::size_t KeySize = 256, std::size_t StepSize = 16,>
 class PairContainer final
 {
 private:
@@ -74,7 +74,7 @@ private:
             return *this;
         }
 
-        ~Pair()
+        ~Pair() noexcept
         {
             free_pair();
         }
