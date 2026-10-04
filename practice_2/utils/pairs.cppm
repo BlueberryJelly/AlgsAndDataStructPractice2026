@@ -11,19 +11,6 @@ private:
     private:
         void allocate(const char* key, double value)
         {
-            if (key == nullptr)
-            {
-                _key = nullptr;
-                _value = value;
-                return;
-            }
-
-            const std::size_t length = std::strlen(key);
-            if (length >= KeySize)
-            {
-                throw std::length_error("Ключ слишком длинный");
-            }
-
             _key = new char[KeySize];
             std::memcpy(_key, key, length + 1);
             _value = value;
@@ -91,7 +78,7 @@ private:
         }
     };
 
-    std::size_t _capacity = 0;
+    std::size_t _capacity = StepSize;
     std::size_t _size = 0;
     Pair** _pairs = nullptr;
 };
