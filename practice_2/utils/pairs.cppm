@@ -2,14 +2,14 @@ export module pairs;
 
 import std;
 
-export template<std::size_t KeySize = 256, std::size_t StepSize = 16>
+export template <std::size_t KeySize = 256, std::size_t StepSize = 16>
 class PairContainer final
 {
 private:
     class Pair final
     {
     private:
-        void allocate(const char* key, double value)
+        void allocate(const char *key, double value)
         {
             _key = new char[KeySize];
             std::memcpy(_key, key, std::strlen(key) + 1);
@@ -23,7 +23,7 @@ private:
             _value = 0;
         }
 
-        void move_pair(Pair&& other) noexcept
+        void move_pair(Pair &&other) noexcept
         {
             _key = other._key;
             other._key = nullptr;
@@ -32,27 +32,27 @@ private:
         }
 
     public:
-        char* _key = nullptr;
+        char *_key = nullptr;
         double _value = 0;
 
         Pair() = default;
 
-        Pair(const char* key, double value)
+        Pair(const char *key, double value)
         {
             allocate(key, value);
         }
 
-        Pair(const Pair& other)
+        Pair(const Pair &other)
         {
             allocate(other._key, other._value);
         }
 
-        Pair(Pair&& other) noexcept
+        Pair(Pair &&other) noexcept
         {
             move_pair(std::move(other));
         }
 
-        Pair& operator=(const Pair& other)
+        Pair &operator=(const Pair &other)
         {
             if (this != &other)
             {
@@ -62,7 +62,7 @@ private:
             return *this;
         }
 
-        Pair& operator=(Pair&& other) noexcept
+        Pair &operator=(Pair &&other) noexcept
         {
             if (this != &other)
             {
@@ -83,7 +83,7 @@ private:
     Pair** _pairs = nullptr;
 
 public:
-    PairContainer(const char* key, double value)
+    PairContainer(const char *key, double value)
         : _size(1)
     {
         if (key == nullptr)
@@ -95,7 +95,7 @@ public:
             throw std::length_error("Недопустимая длина ключа");
         }
 
-        _pairs = new Pair*[_capacity];
+        _pairs = new Pair *[_capacity];
         _pairs[0] = new Pair(key, value);
     }
 };
