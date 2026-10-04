@@ -12,7 +12,7 @@ private:
         void allocate(const char* key, double value)
         {
             _key = new char[KeySize];
-            std::memcpy(_key, key, length + 1);
+            std::memcpy(_key, key, std::strlen(key) + 1);
             _value = value;
         }
 
