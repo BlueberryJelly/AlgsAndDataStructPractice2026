@@ -81,4 +81,21 @@ private:
     std::size_t _capacity = StepSize;
     std::size_t _size = 0;
     Pair** _pairs = nullptr;
+
+public:
+    PairContainer(const char* key, double value)
+        : _size(1)
+    {
+        if (key == nullptr)
+        {
+            throw std::invalid_argument("Отсутсвует ключь");
+        }
+        if (std::strlen(key) >= KeySize)
+        {
+            throw std::length_error("Недопустимая длина ключа");
+        }
+
+        _pairs = new Pair*[_capacity];
+        _pairs[0] = new Pair(key, value);
+    }
 };
