@@ -46,7 +46,7 @@ private:
         }
 
         Pair(Pair &&other) noexcept
-            : _value(other._value), _key(other._key);
+            : _value(other._value), _key(other._key)
         {
             other._value = 0;
             other._key = nullptr;
@@ -105,18 +105,40 @@ private:
 
 public:
     PairContainer(const char *key, double value)
-        : _size(1)
+        : _capacity(StepSize), _size(1)
     {
-        if (key == nullptr)
-        {
-            throw std::invalid_argument("Отсутсвует ключь");
-        }
-        if (std::strlen(key) >= KeySize)
-        {
-            throw std::length_error("Недопустимая длина ключа");
-        }
+        _pairs = new Pair *[StepSize]();
 
-        _pairs = new Pair *[_capacity];
-        _pairs[0] = new Pair(key, value);
+        try
+        {
+            _pairs[0] = new Pair(key, value);
+        }
+        catch (...)
+        {
+            free_pairs();
+            throw;
+        }
+    }
+
+    PairContainer(const PairContainer &other)
+        : _capacity(other._capacity), _size(other._size)
+    {
+        _pairs = new Pair *[other._capacity]();
+
+        try
+        {
+            for (std::size_t index = 0; index < other._size; ++index)
+            {
+                if (other._pairs[index] != nullptr)
+                {
+                    _pairs[index] = new Pair(*other._pairs[index]);
+                }
+            }
+        }
+        catch (...)
+        {
+            free_pairs();
+            throw;
+        }
     }
 };
