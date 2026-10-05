@@ -15,7 +15,7 @@ private:
         {
             if (key == nullptr)
             {
-                throw std::invalid_argument("Ключь не создан: источник не существует");
+                return;
             }
 
             std::size_t length = std::strlen(key) + 1;
