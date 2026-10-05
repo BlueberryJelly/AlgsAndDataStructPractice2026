@@ -86,6 +86,24 @@ private:
     std::size_t _size = 0;
     Pair **_pairs = nullptr;
 
+    void free_data() noexcept
+    {
+        for (std::size_t index = 0; index < _size; ++index)
+        {
+            delete _pairs[index];
+            _pairs[index] = nullptr;
+        }
+        delete[] _pairs;
+        _pairs = nullptr;
+    }
+
+    void free_pairs() noexcept
+    {
+        free_data();
+        _capacity = 0;
+        _size = 0;
+    }
+
 public:
     PairContainer(const char *key, double value)
         : _size(1)
