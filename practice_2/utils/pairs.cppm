@@ -91,7 +91,6 @@ private:
         for (std::size_t index = 0; index < _size; ++index)
         {
             delete _pairs[index];
-            _pairs[index] = nullptr;
         }
         delete[] _pairs;
         _pairs = nullptr;
