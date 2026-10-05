@@ -43,10 +43,9 @@ private:
         }
 
         Pair(Pair &&other) noexcept
-            : _value(other._value)
+            : _value(other._value), _key(other._key);
         {
             other._value = 0;
-            _key = other._key;
             other._key = nullptr;
         }
 
