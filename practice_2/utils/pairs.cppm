@@ -6,34 +6,29 @@ export template <std::size_t KeySize = 256, std::size_t StepSize = 16>
 class PairContainer final
 {
 private:
-    class Pair final
+    struct Pair final
     {
-    private:
-        void allocate(const char *key, double value)
-        {
-            _key = new char[KeySize];
-            std::memcpy(_key, key, std::strlen(key) + 1);
-            _value = value;
-        }
-
-        void free_pair() noexcept
-        {
-            delete[] _key;
-            _key = nullptr;
-            _value = 0;
-        }
-
-        void move_pair(Pair &&other) noexcept
-        {
-            _key = other._key;
-            other._key = nullptr;
-            _value = other._value;
-            other._value = 0;
-        }
-
-    public:
         char *_key = nullptr;
         double _value = 0;
+
+        void allocate(const char *key, double value)
+        {
+            if (key == nullptr)
+            {
+                throw std::invalid_argument("Ключь не создан: источник не существует");
+            }
+
+            std::size_t length = std::strlen(key) + 1;
+
+            if (length > KeySize)
+            {
+                throw std::length_error("Недопустимая длина ключа.");
+            }
+
+            _key = new char[length];
+            std::memcpy(_key, key, length);
+            _value = value;
+        }
 
         Pair() = default;
 
@@ -48,8 +43,11 @@ private:
         }
 
         Pair(Pair &&other) noexcept
+            : _value(other._value)
         {
-            move_pair(std::move(other));
+            other._value = 0;
+            _key = other._key;
+            other._key = nullptr;
         }
 
         Pair &operator=(const Pair &other)
@@ -66,21 +64,25 @@ private:
         {
             if (this != &other)
             {
-                free_pair();
-                move_pair(std::move(other));
+                delete[] _key;
+                _key = other._key;
+                other._key = nullptr;
+                _value = other._value;
+                other._value = 0;
             }
             return *this;
         }
 
         ~Pair() noexcept
         {
-            free_pair();
+            delete[] _key;
+            _key = nullptr;
         }
     };
 
     std::size_t _capacity = StepSize;
     std::size_t _size = 0;
-    Pair** _pairs = nullptr;
+    Pair **_pairs = nullptr;
 
 public:
     PairContainer(const char *key, double value)
