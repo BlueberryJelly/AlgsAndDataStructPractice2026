@@ -5,6 +5,9 @@ import std;
 export template <std::size_t KeySize = 256, std::size_t StepSize = 16>
 class PairContainer final
 {
+    static_assert(KeySize > 0, "KeySize - положительное число.");
+    static_assert(StepSize > 0, "StepSize - положительное число.");
+
 private:
     struct Pair final
     {
@@ -79,7 +82,7 @@ private:
         }
     };
 
-    std::size_t _capacity = StepSize;
+    std::size_t _capacity = 0;
     std::size_t _size = 0;
     Pair **_pairs = nullptr;
 
