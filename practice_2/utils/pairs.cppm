@@ -191,4 +191,32 @@ public:
     {
         return *_pairs[index];
     }
+
+    void reserve(std::size_t new_capacity)
+    {
+        if (new_capacity <= _capacity)
+        {
+            throw std::invalid_argument("Новая вместимость меньше текущей.");
+        }
+
+        Pair **new_pairs = new Pair *[new_capacity]();
+        for (std::size_t index = 0; index < _size; ++index)
+        {
+            new_pairs[index] = _pairs[index];
+        }
+        delete[] _pairs;
+        _pairs = new_pairs;
+        _capacity = new_capacity;
+    }
+
+    void push_back(const char *key, double value)
+    {
+        if (_size + 1 > _capacity)
+        {
+            reserve();
+        }
+
+        _pairs[_size + 1] = new Pair(key, value);
+        ++_size;
+    }
 };
