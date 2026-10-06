@@ -211,7 +211,7 @@ public:
 
     void push_back(const char *key, double value)
     {
-        if (_size + 1 > _capacity)
+        if (_size == _capacity)
         {
             reserve(_capacity + StepSize);
         }
