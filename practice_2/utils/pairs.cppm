@@ -18,7 +18,7 @@ private:
         {
             if (key == nullptr)
             {
-                return;
+                throw std::invalid_argument("Ключ не может быть nullptr.");
             }
 
             std::size_t length = std::strlen(key) + 1;
