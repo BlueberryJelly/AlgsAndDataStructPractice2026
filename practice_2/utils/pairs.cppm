@@ -213,7 +213,7 @@ public:
     {
         if (_size + 1 > _capacity)
         {
-            reserve();
+            reserve(_capacity + StepSize);
         }
 
         _pairs[_size + 1] = new Pair(key, value);
