@@ -107,7 +107,7 @@ private:
     {
         for (std::size_t index = 0; index < _size; ++index)
         {
-            if (std::strcmp(key, _pairs[index]) == 0)
+            if (std::strcmp(key, _pairs[index]->key) == 0)
             {
                 return index;
             }
@@ -207,9 +207,9 @@ public:
 
     double &operator[](const char *key)
     {
-        if (const std::size_t index = find(key); index != std::nullopt)
+        if (const auto index = find(key); index)
         {
-            return _pairs[index]->value;
+            return _pairs[*index]->value;
         }
 
         push_back(key, 0);
@@ -218,14 +218,14 @@ public:
 
     const double &operator[](const char *key) const
     {
-        const std::size_t index = find(key);
+        const auto index = find(key);
 
-        if (index == std::nullopt)
+        if (index)
         {
             throw std::out_of_range("Ключ не найден.");
         }
 
-        return _pairs[index]->value;
+        return _pairs[*index]->value;
     }
 
     void reserve(std::size_t new_capacity)
