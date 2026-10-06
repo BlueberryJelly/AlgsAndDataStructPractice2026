@@ -103,6 +103,19 @@ private:
         _size = 0;
     }
 
+    std::optional<std::size_t> find(const char *key) const noexcept
+    {
+        for (std::size_t index = 0; index < _size; ++index)
+        {
+            if (std::strcmp(key, _pairs[index]) == 0)
+            {
+                return index;
+            }
+        }
+
+        return std::nullopt;
+    }
+
 public:
     PairContainer(const char *key, double value)
         : _capacity(StepSize), _size(1)
