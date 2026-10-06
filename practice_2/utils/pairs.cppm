@@ -141,4 +141,44 @@ public:
             throw;
         }
     }
+
+    PairContainer(PairContainer &&other) noexcept
+        : _capacity(other._capacity), _size(other._size), _pairs(other._pairs)
+    {
+        other._capacity = 0;
+        other._size = 0;
+        other._pairs = nullptr;
+    }
+
+    PairContainer &operator=(const PairContainer &other)
+    {
+        if (this != &other)
+        {
+            PairContainer tmp(other);
+            *this = std::move(tmp);
+        }
+
+        return *this;
+    }
+
+    PairContainer &operator=(PairContainer &&other) noexcept
+    {
+        if (this != &other)
+        {
+            free_pairs();
+            _pairs = other._pairs;
+            other._pairs = nullptr;
+            _capacity = other._capacity;
+            other._capacity = 0;
+            _size = other._size;
+            other._size = 0;
+        }
+
+        return *this;
+    }
+
+    ~PairContainer() noexcept
+    {
+        free_data();
+    }
 };
