@@ -181,4 +181,14 @@ public:
     {
         free_data();
     }
+
+    Pair &operator[](std::size_t index) noexcept
+    {
+        return *_pairs[index];
+    }
+
+    const Pair &operator[](std::size_t index) const noexcept
+    {
+        return *_pairs[index];
+    }
 };
