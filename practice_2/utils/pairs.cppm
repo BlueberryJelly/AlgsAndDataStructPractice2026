@@ -14,14 +14,14 @@ private:
         char *_key = nullptr;
         double _value = 0;
 
-        void allocate(const char *key, double value)
+        void allocate_key(const char *key)
         {
             if (key == nullptr)
             {
                 throw std::invalid_argument("Ключ не может быть nullptr.");
             }
 
-            std::size_t length = std::strlen(key) + 1;
+            const std::size_t length = std::strlen(key) + 1;
 
             if (length > KeySize)
             {
@@ -30,26 +30,30 @@ private:
 
             _key = new char[length];
             std::memcpy(_key, key, length);
-            _value = value;
         }
 
         Pair() = default;
 
         Pair(const char *key, double value)
+            : _value(value)
         {
-            allocate(key, value);
+            allocate_key(key);
         }
 
         Pair(const Pair &other)
+            : _value(other._value)
         {
-            allocate(other._key, other._value);
+            if (other._key != nullptr)
+            {
+                allocate_key(other._key);
+            }
         }
 
         Pair(Pair &&other) noexcept
-            : _value(other._value), _key(other._key)
+            : _key(other._key), _value(other._value)
         {
-            other._value = 0;
             other._key = nullptr;
+            other._value = 0;
         }
 
         Pair &operator=(const Pair &other)
@@ -59,6 +63,7 @@ private:
                 Pair tmp(other);
                 *this = std::move(tmp);
             }
+
             return *this;
         }
 
@@ -68,17 +73,17 @@ private:
             {
                 delete[] _key;
                 _key = other._key;
-                other._key = nullptr;
                 _value = other._value;
+                other._key = nullptr;
                 other._value = 0;
             }
+
             return *this;
         }
 
         ~Pair() noexcept
         {
             delete[] _key;
-            _key = nullptr;
         }
     };
 
@@ -92,22 +97,31 @@ private:
         {
             delete _pairs[index];
         }
+
         delete[] _pairs;
-        _pairs = nullptr;
     }
 
-    void free_pairs() noexcept
+    void take(PairContainer &other) noexcept
     {
-        free_data();
-        _capacity = 0;
-        _size = 0;
+        _pairs = other._pairs;
+        _capacity = other._capacity;
+        _size = other._size;
+
+        other._pairs = nullptr;
+        other._capacity = 0;
+        other._size = 0;
     }
 
-    std::optional<std::size_t> find(const char *key) const noexcept
+    std::optional<std::size_t> find(const char *key) const
     {
+        if (key == nullptr)
+        {
+            throw std::invalid_argument("Ключ не может быть nullptr.");
+        }
+
         for (std::size_t index = 0; index < _size; ++index)
         {
-            if (std::strcmp(key, _pairs[index]->key) == 0)
+            if (std::strcmp(key, _pairs[index]->_key) == 0)
             {
                 return index;
             }
@@ -117,50 +131,23 @@ private:
     }
 
 public:
-    PairContainer(const char *key, double value)
-        : _capacity(StepSize), _size(1)
-    {
-        _pairs = new Pair *[StepSize]();
+    PairContainer() = default;
 
-        try
+    PairContainer(const char *key, double value)
+        : PairContainer()
         {
-            _pairs[0] = new Pair(key, value);
-        }
-        catch (...)
-        {
-            free_pairs();
-            throw;
-        }
+        push_back(key, value);
     }
 
     PairContainer(const PairContainer &other)
-        : _capacity(other._capacity), _size(other._size)
-    {
-        _pairs = new Pair *[other._capacity]();
-
-        try
-        {
-            for (std::size_t index = 0; index < other._size; ++index)
+        : PairContainer()
             {
-                if (other._pairs[index] != nullptr)
-                {
-                    _pairs[index] = new Pair(*other._pairs[index]);
-                }
-            }
-        }
-        catch (...)
-        {
-            free_pairs();
-            throw;
-        }
+        *this += other;
     }
 
     PairContainer(PairContainer &&other) noexcept
-        : _capacity(other._capacity), _size(other._size), _pairs(other._pairs)
     {
-        other._capacity = 0;
-        other._size = 0;
-        other._pairs = nullptr;
+        take(other);
     }
 
     PairContainer &operator=(const PairContainer &other)
@@ -178,13 +165,8 @@ public:
     {
         if (this != &other)
         {
-            free_pairs();
-            _pairs = other._pairs;
-            other._pairs = nullptr;
-            _capacity = other._capacity;
-            other._capacity = 0;
-            _size = other._size;
-            other._size = 0;
+            free_data();
+            take(other);
         }
 
         return *this;
@@ -209,37 +191,39 @@ public:
     {
         if (const auto index = find(key); index)
         {
-            return _pairs[*index]->value;
+            return _pairs[*index]->_value;
         }
 
         push_back(key, 0);
-        return _pairs[_size - 1]->value;
+        return _pairs[_size - 1]->_value;
     }
 
     const double &operator[](const char *key) const
     {
         const auto index = find(key);
 
-        if (index)
+        if (!index)
         {
             throw std::out_of_range("Ключ не найден.");
         }
 
-        return _pairs[*index]->value;
+        return _pairs[*index]->_value;
     }
 
     void reserve(std::size_t new_capacity)
     {
         if (new_capacity <= _capacity)
         {
-            throw std::invalid_argument("Новая вместимость меньше текущей.");
+            return;
         }
 
-        Pair **new_pairs = new Pair *[new_capacity]();
+        Pair **new_pairs = new Pair *[new_capacity];
+
         for (std::size_t index = 0; index < _size; ++index)
         {
             new_pairs[index] = _pairs[index];
         }
+
         delete[] _pairs;
         _pairs = new_pairs;
         _capacity = new_capacity;
@@ -252,7 +236,7 @@ public:
             reserve(_capacity + StepSize);
         }
 
-        _pairs[_size + 1] = new Pair(key, value);
+        _pairs[_size] = new Pair(key, value);
         ++_size;
     }
 };
