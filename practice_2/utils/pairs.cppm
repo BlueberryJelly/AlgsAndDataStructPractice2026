@@ -253,10 +253,10 @@ public:
 
         return *this;
     }
-};
 
-PairContainer operator+(PairContainer lhs, const PairContainer &rhs)
-{
-    lhs += rhs;
-    return lhs;
-}
+    friend PairContainer operator+(PairContainer lhs, const PairContainer &rhs)
+    {
+        lhs += rhs;
+        return lhs;
+    }
+};
