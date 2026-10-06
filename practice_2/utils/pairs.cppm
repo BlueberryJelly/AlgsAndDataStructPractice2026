@@ -205,6 +205,29 @@ public:
         return *_pairs[index];
     }
 
+    double &operator[](const char *key)
+    {
+        if (const std::size_t index = find(key); index != std::nullopt)
+        {
+            return _pairs[index]->value;
+        }
+
+        push_back(key, 0);
+        return _pairs[_size - 1]->value;
+    }
+
+    const double &operator[](const char *key) const
+    {
+        const std::size_t index = find(key);
+
+        if (index == std::nullopt)
+        {
+            throw std::out_of_range("Ключ не найден.");
+        }
+
+        return _pairs[index]->value;
+    }
+
     void reserve(std::size_t new_capacity)
     {
         if (new_capacity <= _capacity)
