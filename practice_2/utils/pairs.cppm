@@ -135,13 +135,13 @@ public:
 
     PairContainer(const char *key, double value)
         : PairContainer()
-        {
+    {
         push_back(key, value);
     }
 
     PairContainer(const PairContainer &other)
         : PairContainer()
-            {
+    {
         *this += other;
     }
 
@@ -238,5 +238,25 @@ public:
 
         _pairs[_size] = new Pair(key, value);
         ++_size;
+    }
+
+    PairContainer &operator+=(const PairContainer &other)
+    {
+        const std::size_t count = other._size;
+
+        reserve(_size + count);
+
+        for (std::size_t index = 0; index < count; ++index)
+        {
+            push_back(other._pairs[index]->_key, other._pairs[index]->_value);
+        }
+
+        return *this;
+    }
+
+    friend PairContainer operator+(PairContainer lhs, const PairContainer &rhs)
+    {
+        lhs += rhs;
+        return lhs;
     }
 };
